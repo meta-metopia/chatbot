@@ -23,7 +23,7 @@ jobs:
       - id: string
         uses: ASzc/change-string-case-action@v5
         with:
-          string: ${{ github.repository }}
+          string: ${{ github.repository }}/ai-chatbot
       - name: Build and push functions
         uses: docker/build-push-action@v3
         with:
