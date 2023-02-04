@@ -1,8 +1,9 @@
-name: "Release app"
+name: Release docker image
+
 on:
   release:
     types:
-      - published
+      - released
 
 jobs:
   docker-service:
@@ -19,12 +20,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - id: string
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ github.repository }}
+      - name: Build and push functions
         uses: docker/build-push-action@v3
         with:
           context: ./
+          file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          tags: ghcr.io/${{ steps.string.outputs.lowercase }}:${{ github.event.release.tag_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
