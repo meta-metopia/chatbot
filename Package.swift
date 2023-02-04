@@ -11,6 +11,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.0.0"),
+        .package(url: "https://github.com/zmeyc/telegram-bot-swift.git", from: "2.0.0"),
+        .package(url: "https://github.com/Alamofire/Alamofire", from: "5.0.0")
     ],
     targets: [
         .target(
@@ -18,8 +20,11 @@ let package = Package(
             dependencies: [
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentMongoDriver", package: "fluent-mongo-driver"),
-                .product(name: "Vapor", package: "vapor")
+                .product(name: "Vapor", package: "vapor"),
+                .product(name: "TelegramBotSDK", package: "telegram-bot-swift"),
+                .product(name: "Alamofire", package: "Alamofire")
             ],
+            resources: [.process("Resources")],
             swiftSettings: [
                 // Enable better optimizations when building in Release configuration. Despite the use of
                 // the `.unsafeFlags` construct required by SwiftPM, this flag is recommended for Release
@@ -27,7 +32,10 @@ let package = Package(
                 .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
             ]
         ),
-        .executableTarget(name: "Run", dependencies: [.target(name: "App")]),
+        .executableTarget(
+            name: "Run",
+            dependencies: [.target(name: "App")]
+        ),
         .testTarget(name: "AppTests", dependencies: [
             .target(name: "App"),
             .product(name: "XCTVapor", package: "vapor"),

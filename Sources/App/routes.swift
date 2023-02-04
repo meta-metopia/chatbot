@@ -2,13 +2,9 @@ import Fluent
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req async in
-        "It works!"
-    }
-
-    app.get("hello") { req async -> String in
-        "Hello, world!"
-    }
-
-    try app.register(collection: TodoController())
+    let bloomChat = try BloomChatbot()
+    let chatbotService = ChatBotService(client: bloomChat, db: app.db)
+    
+    try app.register(collection: BloomChatbotController(service: chatbotService))
+    try app.register(collection: TelegramController(service: chatbotService))
 }
