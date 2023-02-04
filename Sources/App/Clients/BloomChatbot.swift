@@ -62,7 +62,7 @@ class BloomChatbot: ChatbotClientProtocol {
     }
     
     func sendRaw(_ message: String) async throws -> [BloomResponse] {
-        let body = ["inputs": message]
+        let body: [String : Any] = ["inputs": message, "parameters": ["do_sample": false]]
         let headers: Alamofire.HTTPHeaders = [.authorization(bearerToken: apikey)]
         let task = AF.request(endpoint ,method: .post, parameters: body,encoding: JSONEncoding.default ,headers: headers).serializingDecodable([BloomResponse].self)
         let result = try await task.value
