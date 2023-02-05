@@ -7,7 +7,6 @@
 
 import Foundation
 import Vapor
-import Alamofire
 
 enum BloomChatErrors: LocalizedError {
     case missingKeys(key: String)
@@ -30,6 +29,15 @@ struct BloomResponse: MessageProtocol, Codable {
     let generated_text: String
 }
 
+struct BloomBody: Content {
+    struct Param: Content {
+        var do_sample: Bool
+    }
+    
+    var inputs: String
+    var parameters: Param
+}
+
 
 class BloomChatbot: ChatbotClientProtocol {
     typealias Message = ChatSession
@@ -41,13 +49,14 @@ class BloomChatbot: ChatbotClientProtocol {
     let prePromptURL = Bundle.module.url(forResource: "bloom-bot-polite-prepromt", withExtension: ".md")
     let prePrompt: String
     let logger = Logger(label: "bloom.chatbot")
+    let client: Client
     
     var user: User?
     var previous: Message?
     var response: String?
     var userMessage: String?
     
-    init() throws {
+    init(client: Client) throws {
         guard let apiKey = Environment.get("BLOOM_API_KEY") else {
             throw BloomChatErrors.missingKeys(key: "BLOOM_API_KEY")
         }
@@ -58,15 +67,16 @@ class BloomChatbot: ChatbotClientProtocol {
         
         self.apikey = apiKey
         self.endpoint = endpoint
+        self.client = client
         prePrompt = try! String(contentsOf: prePromptURL!)
     }
     
     func sendRaw(_ message: String) async throws -> [BloomResponse] {
-        let body: [String : Any] = ["inputs": message, "parameters": ["do_sample": false]]
-        let headers: Alamofire.HTTPHeaders = [.authorization(bearerToken: apikey)]
-        let task = AF.request(endpoint ,method: .post, parameters: body,encoding: JSONEncoding.default ,headers: headers).serializingDecodable([BloomResponse].self)
-        let result = try await task.value
-        return result
+        logger.debug("Sending request to: \(endpoint), using key: \(apikey)")
+        let body = BloomBody(inputs: message, parameters: .init(do_sample: false))
+        let headers: HTTPHeaders = ["Authorization": "Bearer \(apikey)"]
+        let result = try await self.client.post(.init(stringLiteral: endpoint), headers: headers, content: body)
+        return try result.content.decode([BloomResponse].self)
     }
     
     func sendMessage(_ message: String) async throws -> String {
