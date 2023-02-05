@@ -24,8 +24,8 @@ jobs:
         with:
           context: ./
           platforms: linux/amd64
-          push: false
-          tags: ghcr.io/${{ github.repository }}
+          push: ${{ github.ref == 'refs/heads/main' }}}
+          tags: ghcr.io/${{ github.repository }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
