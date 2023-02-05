@@ -4,13 +4,12 @@ import Vapor
 
 // configures your application
 public func configure(_ app: Application) async throws {
-    try await setupWebhook(app: app)
+//    try await setupWebhook(app: app)
     try app.databases.use(.mongo(
         connectionString: Environment.get("DATABASE_URL")!
     ), as: .mongo)
 
     app.migrations.add(CreateSessions())
-
     // register routes
     try routes(app)
 }
