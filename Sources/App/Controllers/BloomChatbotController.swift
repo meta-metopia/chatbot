@@ -48,7 +48,7 @@ struct BloomChatbotController: RouteCollection {
     
     func chat(req: Request) async throws -> ChatResponse {
         let message = try req.content.decode(ChatUserWithMessage.self)
-        let response = try await service.replyTo(user: message.from, message.message)
+        let response = try await service.replyTo(user: message.from, message.message, shouldUpload: true)
         req.logger.debug("Sending request back...")
         return ChatResponse(message: response.text, audioURL: response.audioURL?.absoluteString)
     }

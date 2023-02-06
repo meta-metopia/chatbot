@@ -8,8 +8,8 @@ func routes(_ app: Application) async throws {
     
     let bloomChat = try BloomChatbot(client: app.client)
     let speechClient = AzureTextToSpeechClient(resourceKey: speechKey)
-//    let s3Client = try S3FileClient()
-    let chatbotService = ChatBotService(client: bloomChat, db: app.db, speech: speechClient)
+    let s3Client = try S3FileClient()
+    let chatbotService = ChatBotService(client: bloomChat, db: app.db, speech: speechClient, s3Client: s3Client)
     
     try await chatbotService.setup()
     

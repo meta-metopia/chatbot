@@ -20,14 +20,15 @@ struct ChatBotServiceReplyResponse {
 class ChatBotService {
     private let client: any ChatbotClientProtocol<ChatSession, ChatUser>
     private let speech: any TextToSpeechProtocol
-//    private let s3Client: any S3FileProtocol
+    private let s3Client: any S3FileProtocol
     private let db: Database
     
     
-    init(client: any ChatbotClientProtocol<ChatSession, ChatUser>, db: Database, speech: any TextToSpeechProtocol) {
+    init(client: any ChatbotClientProtocol<ChatSession, ChatUser>, db: Database, speech: any TextToSpeechProtocol, s3Client: any S3FileProtocol) {
         self.client = client
         self.db = db
         self.speech = speech
+        self.s3Client = s3Client
     }
     
     func setup() async throws {
@@ -77,10 +78,10 @@ class ChatBotService {
     /**
      Generates response from user with message and save the response to the database
      */
-    func replyTo(user: ChatUser, _ userMessage: String) async throws -> ChatBotServiceReplyResponse {
+    func replyTo(user: ChatUser, _ userMessage: String, shouldUpload: Bool = false) async throws -> ChatBotServiceReplyResponse {
         var previousUser = try await ChatUser.query(on: db).filter(\.$userId == user.userId).first()
         var message = try await previousUser?.$chat.get(on: db)
-        let audioURL: URL? = nil
+        var audioURL: URL? = nil
         var localAudioURL: URL? = nil
         
         if previousUser == nil {
@@ -101,7 +102,9 @@ class ChatBotService {
         client.onDestory()
         if message?.chatType == .audio {
             let localURL = try await self.generateAudio(response, session: message!)
-//            audioURL = try await s3Client.upload(from: localURL)
+            if shouldUpload {
+                audioURL = try await s3Client.upload(from: localURL)
+            }
             localAudioURL = localURL
         }
         return ChatBotServiceReplyResponse(text: response, audioURL: audioURL, localAudioURL: localAudioURL)
