@@ -53,7 +53,7 @@ class ChatBotService {
     
     func generateAudio(_ text: String, session: ChatSession) async throws -> URL {
         let date = Date()
-        let fileName = "\(session.id?.uuidString ?? "")_\(date.formatted()).ogg"
+        let fileName = "\(session.id?.uuidString ?? "")_\(date.timeIntervalSince1970).ogg"
         return try await self.speech.toAudio(text, fileName: fileName)
     }
     
