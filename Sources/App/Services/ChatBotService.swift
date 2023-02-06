@@ -57,6 +57,11 @@ class ChatBotService {
         return try await self.speech.toAudio(text, fileName: fileName)
     }
     
+    func delete(file: URL) throws {
+        let fm = FileManager.default
+        try fm.removeItem(at: file)
+    }
+    
     func clearHistory(userId: String) async throws {
         guard let user = try await ChatUser.query(on: db).filter(\.$userId == userId).first() else {
             throw Abort(.notFound)
