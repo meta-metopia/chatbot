@@ -10,4 +10,6 @@ import Foundation
 enum TelegramCommand: String, CaseIterable {
     case clear
     case help
+    case audio
+    case text
 }

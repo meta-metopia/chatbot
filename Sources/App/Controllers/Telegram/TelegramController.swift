@@ -39,6 +39,8 @@ class TelegramController: RouteCollection {
     func setupBotHandlers(router: inout TelegramBotSDK.Router) {
         router[TelegramCommand.help.rawValue] = HelpHandler(service: service, bot: bot).handle
         router[TelegramCommand.clear.rawValue] = ClearHandler(service: service, bot: bot).handle
+        router[TelegramCommand.text.rawValue] = ChatTypeHandler(service: service, bot: bot, type: .text).handle
+        router[TelegramCommand.audio.rawValue] = ChatTypeHandler(service: service, bot: bot, type: .audio).handle
 
         router[.newChatMembers] = { context in
             guard let users = context.message?.newChatMembers else { return false }

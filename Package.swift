@@ -1,17 +1,19 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "next-chatbot-server",
     platforms: [
-       .macOS(.v12)
+       .macOS(.v13)
     ],
     dependencies: [
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent-mongo-driver.git", from: "1.0.0"),
-        .package(url: "https://github.com/zmeyc/telegram-bot-swift.git", from: "2.0.0")
+        .package(url: "https://github.com/zmeyc/telegram-bot-swift.git", from: "2.0.0"),
+        .package(url: "https://github.com/sirily11/AzureTextToSpeech-Swift", branch: "main"),
+        .package(url: "https://github.com/soto-project/soto.git", from: "6.0.0")
     ],
     targets: [
         .target(
@@ -20,7 +22,9 @@ let package = Package(
                 .product(name: "Fluent", package: "fluent"),
                 .product(name: "FluentMongoDriver", package: "fluent-mongo-driver"),
                 .product(name: "Vapor", package: "vapor"),
-                .product(name: "TelegramBotSDK", package: "telegram-bot-swift")
+                .product(name: "TelegramBotSDK", package: "telegram-bot-swift"),
+                .product(name: "AzureTextToSpeech", package: "AzureTextToSpeech-Swift"),
+                .product(name: "SotoS3", package: "soto")
             ],
             resources: [.process("Resources")],
             swiftSettings: [
