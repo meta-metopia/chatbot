@@ -21,7 +21,7 @@ class ChatHandler: Handler, TelegramProtocol {
                 if let audioURL = result.localAudioURL {
                     let content = try Data(contentsOf: audioURL)
                     bot.sendDocumentSync(chatId: .chat(chatId), document: .inputFile(.init(filename: audioURL.lastPathComponent, data: content)))
-                    
+                    try service.delete(file: audioURL)
                 } else {
                     bot.sendMessageSync(chatId: .chat(chatId), text: result.text)
                 }
