@@ -8,6 +8,7 @@
 import Foundation
 import Fluent
 import Vapor
+import TelegramBotSDK
 
 final class ChatUser: Content, Model, UserProtocol {
     static let schema = "chat-user"
@@ -32,5 +33,19 @@ final class ChatUser: Content, Model, UserProtocol {
     init(userId: String, userName: String) {
         self.userId = userId
         self.userName = userName
+    }
+    
+    static func from(user: TelegramBotSDK.User) -> ChatUser {
+        var userName = ""
+        if let name = user.username {
+            userName = name
+        } else {
+            userName += user.firstName
+            if let lastname = user.lastName {
+                userName += " " + lastname
+            }
+        }
+        
+        return ChatUser(userId: String(user.id), userName: userName)
     }
 }

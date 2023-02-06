@@ -11,6 +11,7 @@ services:
       TELEGRAM_KEY: ${TELEGRAM_KEY}
       BLOOM_API_KEY: ${BLOOM_API_KEY}
       BLOOM_ENDPOINT: ${BLOOM_ENDPOINT}
+      AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY}
       LOG_LEVEL: debug
     # user: '0' # uncomment to run as root for testing purposes even though Dockerfile defines 'vapor' user.
     command: ["serve", "--hostname", "0.0.0.0", "--port", "8080"]

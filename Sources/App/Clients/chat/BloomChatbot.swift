@@ -104,7 +104,7 @@ class BloomChatbot: ChatbotClientProtocol {
         }
         
         let newHistory = combineHistoryForDatabase(previous: previous?.history, response: response, userMessage: userMessage)
-        return ChatSession(history: newHistory)
+        return ChatSession(history: newHistory, chatType: .text)
     }
     
     func load(message: ChatSession?, for user: ChatUser) async throws {

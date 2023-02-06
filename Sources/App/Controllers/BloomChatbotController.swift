@@ -6,11 +6,17 @@ struct BloomChatbotController: RouteCollection {
     
     struct ChatResponse: Content {
         var message: String
+        var audioURL: String?
     }
     
     struct ChatUserWithMessage: Content {
         var from: ChatUser
         var message: String
+    }
+    
+    struct UpdateChatTypeRequest: Content {
+        var user: ChatUser
+        var type: ChatType
     }
     
     init(service: ChatBotService) {
@@ -20,6 +26,14 @@ struct BloomChatbotController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         routes.post("chat", use: chat)
         routes.delete("chat", ":id", use: delete)
+        routes.patch("chat", "type", use: updateChatType)
+    }
+    
+    func updateChatType(req: Request) async throws -> Response {
+        let content = try req.content.decode(UpdateChatTypeRequest.self)
+        try await service.updateChatSessionType(user: content.user, type: content.type)
+        
+        return Response(status: .ok)
     }
     
     func delete(req: Request) async throws -> Response {
@@ -36,6 +50,6 @@ struct BloomChatbotController: RouteCollection {
         let message = try req.content.decode(ChatUserWithMessage.self)
         let response = try await service.replyTo(user: message.from, message.message)
         req.logger.debug("Sending request back...")
-        return ChatResponse(message: response)
+        return ChatResponse(message: response.text, audioURL: response.audioURL?.absoluteString)
     }
 }

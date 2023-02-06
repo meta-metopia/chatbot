@@ -14,11 +14,17 @@ class ChatHandler: Handler, TelegramProtocol {
             return true
         }
         
-        if let message = context.message, let text = message.text, let user = message.from {
+        if let message = context.message, let text = message.text, let user = message.from, let chatId = context.chatId {
             Task {
                 bot.sendChatActionSync(chatId: .chat(context.chatId!), action: .typing)
-                let result = try await service.replyTo(user: .init(userId: String(user.id), userName: user.username ?? "Anno"), text)
-                context.respondSync(result)
+                let result = try await service.replyTo(user: .from(user: user), text)
+                if let audioURL = result.localAudioURL {
+                    let content = try Data(contentsOf: audioURL)
+                    bot.sendDocumentSync(chatId: .chat(chatId), document: .inputFile(.init(filename: audioURL.lastPathComponent, data: content)))
+                    
+                } else {
+                    bot.sendMessageSync(chatId: .chat(chatId), text: result.text)
+                }
             }
             
             return true
