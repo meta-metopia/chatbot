@@ -61,6 +61,6 @@ class S3FileClient: S3FileProtocol {
         let key = local.lastPathComponent
         let putObjectRequest = S3.PutObjectRequest(acl: .publicRead, body: .data(data), bucket: bucket, key: key)
         _ = try await s3.putObject(putObjectRequest)
-        return (URL(string: publicEndpoint)!.appending(component: bucket).appending(component: key))
+        return URL(string: "\(publicEndpoint)/\(bucket)/\(key)")!
     }
 }
